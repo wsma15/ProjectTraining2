@@ -35,7 +35,7 @@ namespace LoginApp
                         int roleId = Convert.ToInt32(reader["RoleId"]);
 
                         // Verify the password
-                        if (PasswordHelper.VerifyPassword(password, storedHash))
+                        if (password==PasswordHelper.Decrypt( storedHash))
                         {
                             // Redirect based on role
                             switch (roleId)

@@ -1,7 +1,68 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.IO;
+using System.Text;
 
-public static class PasswordHelper
+public class PasswordHelper
+{
+    // Example key and IV
+    private static readonly byte[] Key = Encoding.UTF8.GetBytes("Your16ByteKey123"); // 16 bytes for AES-128
+    private static readonly byte[] Iv = Encoding.UTF8.GetBytes("Your16ByteIV1234"); // 16 bytes IV
+
+    // Encrypt a plaintext string
+    public static string HashPassword(string plainText)
+    {
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = Key;
+            aes.IV = Iv;
+
+            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter sw = new StreamWriter(cs))
+                    {
+                        sw.Write(plainText);
+                    }
+                }
+
+                return Convert.ToBase64String(ms.ToArray());
+            }
+        }
+    }
+
+    // Decrypt an encrypted string
+    public static string Decrypt(string cipherText)
+    {
+        byte[] cipherBytes = Convert.FromBase64String(cipherText);
+
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = Key;
+            aes.IV = Iv;
+
+            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+            using (MemoryStream ms = new MemoryStream(cipherBytes))
+            {
+                using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+
+/*public static class PasswordHelper
 {
     private const int SaltSize = 16; // 128 bit
     private const int HashSize = 20; // 160 bit
@@ -53,3 +114,4 @@ public static class PasswordHelper
         return true;
     }
 }
+*/
