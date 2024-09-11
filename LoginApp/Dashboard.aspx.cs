@@ -1,8 +1,7 @@
-﻿using System;
+﻿using DevExpress.Web;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text.RegularExpressions;
-using DevExpress.Web;
 using System.Text.RegularExpressions;
 
 namespace LoginApp
@@ -10,15 +9,6 @@ namespace LoginApp
     public partial class Dashboard : System.Web.UI.Page
     {
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
-
-        protected void Page_Load(object sender, EventArgs e)
-        {
-            if (!IsPostBack)
-            {
-                BindUsersGridView();
-                BindRolesGridView();
-            }
-        }
 
         private void BindUsersGridView()
         {
@@ -34,7 +24,6 @@ namespace LoginApp
                 da.Fill(dt); // Use Fill to directly load the data into the DataTable
                 conn.Close();
 
-                // Decrypt passwords if absolutely necessary
                 foreach (DataRow row in dt.Rows)
                 {
                     string encryptedPassword = row["Password"].ToString();
@@ -44,7 +33,39 @@ namespace LoginApp
 
                 ASPxGridView1.DataSource = dt;
                 ASPxGridView1.DataBind();
+                ASPxGridView1.EnableViewState = false;
             }
+        }
+
+        private bool IsValidUsername(string username)
+        {
+            var regex = new Regex(@"^[a-zA-Z0-9]{6,}$");
+            return regex.IsMatch(username);
+        }
+
+        private bool IsValidPassword(string password)
+        {
+            var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
+            return regex.IsMatch(password);
+        }
+
+        private bool IsRoleAssignedToUsers(int roleId)
+        {
+            bool isAssigned = false;
+            string query = "SELECT COUNT(*) FROM [dbo].[Users] WHERE RoleId = @RoleId";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@RoleId", roleId);
+
+                conn.Open();
+                int count = (int)cmd.ExecuteScalar();
+                conn.Close();
+
+                isAssigned = count > 0;
+            }
+            return isAssigned;
         }
 
         private void BindRolesGridView()
@@ -59,10 +80,26 @@ namespace LoginApp
                 da.Fill(dt);
                 ASPxGridView2.DataSource = dt;
                 ASPxGridView2.DataBind();
+                ASPxGridView2.EnableViewState = false;
+
             }
         }
 
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            BindUsersGridView();
+            BindRolesGridView();
+        }
 
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                BindUsersGridView();
+                BindRolesGridView();
+            }
+        }
+ 
         protected void ASPxGridView1_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
             if (e.NewValues["Username"] != null && e.NewValues["Password"] != null)
@@ -72,7 +109,6 @@ namespace LoginApp
                 string hashedPassword = PasswordHelper.HashPassword(password);
                 int roleId = Convert.ToInt32(e.NewValues["RoleId"]);
 
-                // Validate username
                 if (!IsValidUsername(username))
                 {
                     e.Cancel = true;
@@ -80,7 +116,6 @@ namespace LoginApp
                     return;
                 }
 
-                // Validate password
                 if (!IsValidPassword(password))
                 {
                     e.Cancel = true;
@@ -106,18 +141,6 @@ namespace LoginApp
                 ASPxGridView1.CancelEdit();
                 BindUsersGridView();
             }
-        }
-
-        private bool IsValidUsername(string username)
-        {
-            var regex = new Regex(@"^[a-zA-Z0-9]{6,}$");
-            return regex.IsMatch(username);
-        }
-
-        private bool IsValidPassword(string password)
-        {
-            var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
-            return regex.IsMatch(password);
         }
 
         protected void ASPxGridView1_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
@@ -242,24 +265,10 @@ namespace LoginApp
             }
         }
 
-        private bool IsRoleAssignedToUsers(int roleId)
+        protected void ASPxGridView1_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
         {
-            bool isAssigned = false;
-            string query = "SELECT COUNT(*) FROM [dbo].[Users] WHERE RoleId = @RoleId";
-
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@RoleId", roleId);
-
-                conn.Open();
-                int count = (int)cmd.ExecuteScalar();
-                conn.Close();
-
-                isAssigned = count > 0;
-            }
-
-            return isAssigned;
+            System.Diagnostics.Debug.WriteLine($"CustomCallback triggered. Parameters: {e.Parameters}");
+            BindUsersGridView();
         }
     }
 }

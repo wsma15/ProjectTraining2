@@ -16,7 +16,7 @@
                                 <dx:ASPxGridView ID="ASPxGridView2" runat="server" KeyFieldName="RoleId" AutoGenerateColumns="true"
                                     OnRowDeleting="ASPxGridView2_RowDeleting"
                                     OnRowInserting="ASPxGridView2_RowInserting"
-                                    OnRowUpdating="ASPxGridView2_RowUpdating" EnableCallBacks="true">
+                                    OnRowUpdating="ASPxGridView2_RowUpdating" EnableCallBacks="true" Theme="Default">
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn ShowEditButton="True" VisibleIndex="0" ShowNewButtonInHeader="True" ShowDeleteButton="True" />
@@ -36,14 +36,16 @@
                                 <dx:ASPxGridView ID="ASPxGridView1" runat="server" AutoGenerateColumns="false" KeyFieldName="Username"
                                     OnRowInserting="ASPxGridView1_RowInserting"
                                     OnRowUpdating="ASPxGridView1_RowUpdating"
-                                    OnRowDeleting="ASPxGridView1_RowDeleting"
+                                    OnRowDeleting="ASPxGridView1_RowDeleting"  OnCustomCallback="ASPxGridView1_CustomCallback" EnableRowsCache="false"
+                                   
                                     EnableCallBacks="True"
                                     Theme="Default">
-                                    <Settings ShowFilterRow="True" />
+
+                                    <Settings ShowFilterRow="True" ShowGroupPanel="True" />
                                     <SettingsSearchPanel Visible="True" />
                                     <SettingsBehavior AllowSort="True" />
                                     <Columns>
-                                        <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" ShowClearFilterButton="True" />
+                                        <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" ShowClearFilterButton="True" SelectAllCheckboxMode="Page" ShowSelectCheckbox="True" />
                                         <dx:GridViewDataTextColumn FieldName="Username" Caption="Username" VisibleIndex="1" />
                                         <dx:GridViewDataTextColumn FieldName="Password" Caption="Password" VisibleIndex="2" />
                                         <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role" VisibleIndex="3">
@@ -61,17 +63,5 @@
                 SelectCommand="SELECT RoleId, RoleName FROM [dbo].[Roles]" />
         </div>
     </form>
-    <script type="text/javascript">
-        function OnEndCallback(s, e) {
-            var message = s.cpMessage;
-            if (message) {
-                alert(message);
-            }
-        }
-
-        function OnInit(s, e) {
-            s.EndCallback = OnEndCallback;
-        }
-    </script>
 </body>
 </html>
