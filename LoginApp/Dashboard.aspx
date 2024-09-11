@@ -13,10 +13,10 @@
                     <dx:TabPage Name="RolePage" Text="Role">
                         <ContentCollection>
                             <dx:ContentControl runat="server">
-                                <dx:ASPxGridView ID="ASPxGridView2" runat="server" KeyFieldName="RoleId" AutoGenerateColumns="true"
-                                    OnRowDeleting="ASPxGridView2_RowDeleting"
-                                    OnRowInserting="ASPxGridView2_RowInserting" OnRowValidating="ASPxGridView2_RowValidating"
-                                    OnRowUpdating="ASPxGridView2_RowUpdating" EnableCallBacks="true" Theme="Default">
+                                <dx:ASPxGridView ID="RolesGridView" runat="server" KeyFieldName="RoleId" AutoGenerateColumns="true"
+                                    OnRowDeleting="RolesGridView_RowDeleting"
+                                    OnRowInserting="RolesGridView_RowInserting" OnRowValidating="RolesGridView_RowValidating"
+                                    OnRowUpdating="RolesGridView_RowUpdating" EnableCallBacks="true" Theme="Default">
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn ShowEditButton="True" VisibleIndex="0" ShowNewButtonInHeader="True" ShowDeleteButton="True" />
@@ -33,10 +33,11 @@
                     <dx:TabPage Name="UsersPage" Text="Users">
                         <ContentCollection>
                             <dx:ContentControl runat="server">
-                                <dx:ASPxGridView ID="ASPxGridView1" runat="server" AutoGenerateColumns="false" KeyFieldName="Username"
-                                    OnRowInserting="ASPxGridView1_RowInserting"
-                                    OnRowUpdating="ASPxGridView1_RowUpdating"
-                                    OnRowDeleting="ASPxGridView1_RowDeleting"  OnCustomCallback="ASPxGridView1_CustomCallback" EnableRowsCache="false" OnRowValidating="ASPxGridView1_RowValidating"
+                                <dx:ASPxGridView ID="UsersGridView" runat="server" AutoGenerateColumns="false" KeyFieldName="Username"
+                                    OnRowInserting="UsersGridView_RowInserting"
+                                    OnRowUpdating="UsersGridView_RowUpdating"
+                                    OnRowDeleting="UsersGridView_RowDeleting"  OnCustomCallback="UsersGridView_CustomCallback"
+                                    EnableRowsCache="false" OnRowValidating="UsersGridView_RowValidating"
                                    
                                     EnableCallBacks="True"
                                     Theme="Default">

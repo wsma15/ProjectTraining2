@@ -31,9 +31,9 @@ namespace LoginApp
                     row["Password"] = decryptedPassword;
                 }
 
-                ASPxGridView1.DataSource = dt;
-                ASPxGridView1.DataBind();
-                ASPxGridView1.EnableViewState = false;
+                UsersGridView.DataSource = dt;
+                UsersGridView.DataBind();
+                UsersGridView.EnableViewState = false;
             }
         }
 
@@ -84,9 +84,9 @@ namespace LoginApp
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-                ASPxGridView2.DataSource = dt;
-                ASPxGridView2.DataBind();
-                ASPxGridView2.EnableViewState = false;
+                RolesGridView.DataSource = dt;
+                RolesGridView.DataBind();
+                RolesGridView.EnableViewState = false;
 
             }
         }
@@ -106,7 +106,7 @@ namespace LoginApp
             }
         }
  
-        protected void ASPxGridView1_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
+        protected void UsersGridView_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
             if (e.NewValues["Username"] != null && e.NewValues["Password"] != null)
             {
@@ -118,14 +118,14 @@ namespace LoginApp
                 if (!IsValidUsername(username))
                 {
                     e.Cancel = true;
-                    ASPxGridView1.JSProperties["cpMessage"] = "Username must be at least 6 characters long, and contain no spaces or special characters.";
+                    UsersGridView.JSProperties["cpMessage"] = "Username must be at least 6 characters long, and contain no spaces or special characters.";
                     return;
                 }
 
                 if (!IsValidPassword(password))
                 {
                     e.Cancel = true;
-                    ASPxGridView1.JSProperties["cpMessage"] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+                    UsersGridView.JSProperties["cpMessage"] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
                     return;
                 }
 
@@ -144,12 +144,12 @@ namespace LoginApp
                 }
 
                 e.Cancel = true;
-                ASPxGridView1.CancelEdit();
+                UsersGridView.CancelEdit();
                 BindUsersGridView();
             }
         }
 
-        protected void ASPxGridView1_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
+        protected void UsersGridView_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
         {
             string username = e.Keys["Username"].ToString();
             string password = e.NewValues["Password"].ToString();
@@ -170,11 +170,41 @@ namespace LoginApp
             }
 
             e.Cancel = true;
-            ASPxGridView1.CancelEdit();
+            UsersGridView.CancelEdit();
+            BindUsersGridView();
+        }
+   
+        protected void UsersGridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"CustomCallback triggered. Parameters: {e.Parameters}");
             BindUsersGridView();
         }
 
-        protected void ASPxGridView1_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
+        protected void UsersGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
+        {
+            foreach (GridViewColumn row in UsersGridView.Columns)
+            {
+                GridViewDataColumn dataRow = row as GridViewDataColumn;
+                if (dataRow == null) continue;
+                if (e.NewValues[dataRow.FieldName] == null)
+                    e.Errors[dataRow] = "Value cannot be null.";
+            }
+
+            if ((e.NewValues["Username"]) != null &&
+                !IsValidUsername(e.NewValues["Username"].ToString()))
+            {
+                e.Errors[(GridViewDataColumn)UsersGridView.Columns["Username"]] = "The input must be at least 6 characters long, only contain letters and numbers, and have no special characters.";
+            }
+
+            if ((e.NewValues["Password"]) != null &&
+                !IsValidPassword(e.NewValues["Password"].ToString()))
+            {
+                e.Errors[(GridViewDataColumn)UsersGridView.Columns["Password"]] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+            }
+            if (e.Errors.Count > 0) e.RowError = "Please fill in all fields.";
+        }
+
+        protected void UsersGridView_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
         {
             string username = e.Keys["Username"].ToString();
 
@@ -194,7 +224,7 @@ namespace LoginApp
             BindUsersGridView();
         }
 
-        protected void ASPxGridView2_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
+        protected void RolesGridView_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
             if (e.NewValues["RoleName"] != null)
             {
@@ -212,12 +242,12 @@ namespace LoginApp
                 }
 
                 e.Cancel = true;
-                ASPxGridView2.CancelEdit();
+                RolesGridView.CancelEdit();
                 BindRolesGridView();
             }
         }
 
-        protected void ASPxGridView2_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
+        protected void RolesGridView_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
         {
             string roleId = e.Keys["RoleId"].ToString();
             string roleName = e.NewValues["RoleName"].ToString();
@@ -235,11 +265,11 @@ namespace LoginApp
             }
 
             e.Cancel = true;
-            ASPxGridView2.CancelEdit();
+            RolesGridView.CancelEdit();
             BindRolesGridView();
         }
 
-        protected void ASPxGridView2_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
+        protected void RolesGridView_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
         {
             int roleId = Convert.ToInt32(e.Keys["RoleId"]);
 
@@ -247,7 +277,7 @@ namespace LoginApp
             if (IsRoleAssignedToUsers(roleId))
             {
                 // Display a message to the user
-                ASPxGridView2.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
+                RolesGridView.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
                 e.Cancel = true; // Cancel the delete operation
             }
             else
@@ -271,49 +301,20 @@ namespace LoginApp
             }
         }
 
-        protected void ASPxGridView1_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine($"CustomCallback triggered. Parameters: {e.Parameters}");
-            BindUsersGridView();
-        }
-
-        protected void ASPxGridView1_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
-        {
-            foreach (GridViewColumn row in ASPxGridView1.Columns)
-            {
-                GridViewDataColumn dataRow = row as GridViewDataColumn;
-                if (dataRow == null) continue;
-                if (e.NewValues[dataRow.FieldName] == null)
-                    e.Errors[dataRow] = "Value cannot be null.";
-            }
-
-            if ((e.NewValues["Username"]) != null &&
-                !IsValidUsername(e.NewValues["Username"].ToString()))
-            {
-                e.Errors[(GridViewDataColumn)ASPxGridView1.Columns["Username"]] = "The input must be at least 6 characters long, only contain letters and numbers, and have no special characters.";
-            }
-
-            if ((e.NewValues["Password"]) != null &&
-                !IsValidPassword(e.NewValues["Password"].ToString()))
-            {
-                e.Errors[(GridViewDataColumn)ASPxGridView1.Columns["Password"]] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
-            }
-            if (e.Errors.Count > 0) e.RowError = "Please fill in all fields.";
-        }
         
-        protected void ASPxGridView2_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
+        protected void RolesGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
         {
             // Check if the "RoleName" value is null
             if (e.NewValues["RoleName"] == null)
             {
-                e.Errors[ASPxGridView2.Columns["RoleName"]] = "Value cannot be null.";
+                e.Errors[RolesGridView.Columns["RoleName"]] = "Value cannot be null.";
             }
             else
             {
                 // Validate the "RoleName" value using the IsValidName method
                 if (!IsValidName(e.NewValues["RoleName"].ToString()))
                 {
-                    e.Errors[ASPxGridView2.Columns["RoleName"]] = "The name must contain only letters and have at least two words.";
+                    e.Errors[RolesGridView.Columns["RoleName"]] = "The name must contain only letters and have at least two words.";
                 }
             }
 
