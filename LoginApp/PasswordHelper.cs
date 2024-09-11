@@ -8,7 +8,7 @@ public class PasswordHelper
     // Example key and IV
     private static readonly byte[] Key = Encoding.UTF8.GetBytes("Your16ByteKey123"); // 16 bytes for AES-128
     private static readonly byte[] Iv = Encoding.UTF8.GetBytes("Your16ByteIV1234"); // 16 bytes IV
-
+    
     // Encrypt a plaintext string
     public static string HashPassword(string plainText)
     {

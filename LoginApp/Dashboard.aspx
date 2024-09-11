@@ -15,7 +15,7 @@
                             <dx:ContentControl runat="server">
                                 <dx:ASPxGridView ID="ASPxGridView2" runat="server" KeyFieldName="RoleId" AutoGenerateColumns="true"
                                     OnRowDeleting="ASPxGridView2_RowDeleting"
-                                    OnRowInserting="ASPxGridView2_RowInserting"
+                                    OnRowInserting="ASPxGridView2_RowInserting" OnRowValidating="ASPxGridView2_RowValidating"
                                     OnRowUpdating="ASPxGridView2_RowUpdating" EnableCallBacks="true" Theme="Default">
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
@@ -36,7 +36,7 @@
                                 <dx:ASPxGridView ID="ASPxGridView1" runat="server" AutoGenerateColumns="false" KeyFieldName="Username"
                                     OnRowInserting="ASPxGridView1_RowInserting"
                                     OnRowUpdating="ASPxGridView1_RowUpdating"
-                                    OnRowDeleting="ASPxGridView1_RowDeleting"  OnCustomCallback="ASPxGridView1_CustomCallback" EnableRowsCache="false"
+                                    OnRowDeleting="ASPxGridView1_RowDeleting"  OnCustomCallback="ASPxGridView1_CustomCallback" EnableRowsCache="false" OnRowValidating="ASPxGridView1_RowValidating"
                                    
                                     EnableCallBacks="True"
                                     Theme="Default">

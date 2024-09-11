@@ -43,6 +43,12 @@ namespace LoginApp
             return regex.IsMatch(username);
         }
 
+        private bool IsValidName(string name)
+        {
+            var regex = new Regex(@"^[a-zA-Z]+( [a-zA-Z]+)*$");
+            return regex.IsMatch(name);
+        }
+
         private bool IsValidPassword(string password)
         {
             var regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$");
@@ -269,6 +275,53 @@ namespace LoginApp
         {
             System.Diagnostics.Debug.WriteLine($"CustomCallback triggered. Parameters: {e.Parameters}");
             BindUsersGridView();
+        }
+
+        protected void ASPxGridView1_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
+        {
+            foreach (GridViewColumn row in ASPxGridView1.Columns)
+            {
+                GridViewDataColumn dataRow = row as GridViewDataColumn;
+                if (dataRow == null) continue;
+                if (e.NewValues[dataRow.FieldName] == null)
+                    e.Errors[dataRow] = "Value cannot be null.";
+            }
+
+            if ((e.NewValues["Username"]) != null &&
+                !IsValidUsername(e.NewValues["Username"].ToString()))
+            {
+                e.Errors[(GridViewDataColumn)ASPxGridView1.Columns["Username"]] = "The input must be at least 6 characters long, only contain letters and numbers, and have no special characters.";
+            }
+
+            if ((e.NewValues["Password"]) != null &&
+                !IsValidPassword(e.NewValues["Password"].ToString()))
+            {
+                e.Errors[(GridViewDataColumn)ASPxGridView1.Columns["Password"]] = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+            }
+            if (e.Errors.Count > 0) e.RowError = "Please fill in all fields.";
+        }
+        
+        protected void ASPxGridView2_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
+        {
+            // Check if the "RoleName" value is null
+            if (e.NewValues["RoleName"] == null)
+            {
+                e.Errors[ASPxGridView2.Columns["RoleName"]] = "Value cannot be null.";
+            }
+            else
+            {
+                // Validate the "RoleName" value using the IsValidName method
+                if (!IsValidName(e.NewValues["RoleName"].ToString()))
+                {
+                    e.Errors[ASPxGridView2.Columns["RoleName"]] = "The name must contain only letters and have at least two words.";
+                }
+            }
+
+            // Set a general error if any specific errors are found
+            if (e.Errors.Count > 0)
+            {
+                e.RowError = "Please fill in all fields correctly.";
+            }
         }
     }
 }
