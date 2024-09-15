@@ -112,7 +112,7 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                 string username = e.NewValues["Username"].ToString();
                 string password = e.NewValues["Password"].ToString();
                 string hashedPassword = PasswordHelper.HashPassword(password);
-                var RoleId = e.NewValues["RoleId"]; // Use the exact name of the field
+                var RoleId = e.NewValues["RoleId"]; 
 
                 if (RoleId == null)
                 {
@@ -142,7 +142,7 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@Password", hashedPassword);
-                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value); // Use DBNull.Value if RoleId is null
+                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value); 
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -279,16 +279,13 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
         {
             int RoleId = Convert.ToInt32(e.Keys["Id"]);
 
-            // Check if the role is assigned to any users
             if (IsRoleAssignedToUsers(RoleId))
             {
-                // Display a message to the user
                 RolesGridView.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
-                e.Cancel = true; // Cancel the delete operation
+                e.Cancel = true; 
             }
             else
             {
-                // Proceed with deletion
                 string query = "DELETE FROM [dbo].[Roles] WHERE Id = @id";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -301,7 +298,6 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                     conn.Close();
                 }
 
-                // Cancel the default delete operation and manually refresh the GridView
                 e.Cancel = true;
                 BindRolesGridView();
             }
@@ -310,21 +306,18 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
         
         protected void RolesGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
         {
-            // Check if the "RoleName" value is null
             if (e.NewValues["Name"] == null)
             {
                 e.Errors[RolesGridView.Columns["Name"]] = "Value cannot be null.";
             }
             else
             {
-                // Validate the "RoleName" value using the IsValidName method
                 if (!IsValidName(e.NewValues["Name"].ToString()))
                 {
                     e.Errors[RolesGridView.Columns["Name"]] = "The name must contain only letters and have at least two words.";
                 }
             }
 
-            // Set a general error if any specific errors are found
             if (e.Errors.Count > 0)
             {
                 e.RowError = "Please fill in all fields correctly.";
