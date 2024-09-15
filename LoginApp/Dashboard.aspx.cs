@@ -21,7 +21,7 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                 DataTable dt = new DataTable();
 
                 conn.Open();
-                da.Fill(dt); // Use Fill to directly load the data into the DataTable
+                da.Fill(dt); 
                 conn.Close();
 
                 foreach (DataRow row in dt.Rows)
