@@ -22,12 +22,14 @@
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn ShowEditButton="True" VisibleIndex="0" ShowNewButtonInHeader="True" ShowDeleteButton="True" />
-                                        <dx:GridViewDataTextColumn FieldName="Id" Caption="Role ID" VisibleIndex="1">
+                                        <dx:GridViewDataTextColumn FieldName="Id" Caption="ID" VisibleIndex="1">
                                             <EditFormSettings Visible="False" />
                                         </dx:GridViewDataTextColumn>
-                                        <dx:GridViewDataTextColumn FieldName="Name" Caption="Role Name" VisibleIndex="2" />
+                                        <dx:GridViewDataTextColumn FieldName="Name" Caption="Name" VisibleIndex="2" />
                                     </Columns>
+       
                                 </dx:ASPxGridView>
+            <asp:Button ID="RolesbtnExportPDF" runat="server" Text="Export to PDF" OnClick="RolesbtnExportPDF_Click" />
                             </dx:ContentControl>
                         </ContentCollection>
                     </dx:TabPage>
@@ -42,7 +44,6 @@
                                     OnRowUpdating="UsersGridView_RowUpdating"
                                     OnRowDeleting="UsersGridView_RowDeleting" OnRowValidating="UsersGridView_RowValidating"
                                     EnableRowsCache="false"
-
                                     EnableCallBacks="true"
                                     Theme="Default">
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
@@ -50,12 +51,14 @@
                                         <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" />
                                         <dx:GridViewDataTextColumn FieldName="Username" Caption="Username" VisibleIndex="1" />
                                         <dx:GridViewDataTextColumn FieldName="Password" Caption="Password" VisibleIndex="2" />
-                                <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role"  VisibleIndex="3" ReadOnly="false" PropertiesComboBox-DataSourceID="RoleDataSource" PropertiesComboBox-TextField="Name" PropertiesComboBox-ValueField="Id" LoadReadOnlyValueFromDataModel="false">
+                                        <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role" VisibleIndex="3" ReadOnly="false" PropertiesComboBox-DataSourceID="RoleDataSource" PropertiesComboBox-TextField="Name" PropertiesComboBox-ValueField="Id" LoadReadOnlyValueFromDataModel="false">
                                         </dx:GridViewDataComboBoxColumn>
 
 
                                     </Columns>
                                 </dx:ASPxGridView>
+            <asp:Button ID="UsersbtnExportPDF" runat="server" Text="Export to PDF" OnClick="UsersbtnExportPDF_Click" />
+
                             </dx:ContentControl>
                         </ContentCollection>
                     </dx:TabPage>
@@ -69,7 +72,7 @@
             <asp:SqlDataSource ID="UserDataSource" runat="server"
                 ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True"
                 SelectCommand="SELECT Username, Password, RoleId FROM [dbo].[Users]" />
-<CR:CrystalReportViewer ID="Report" runat="server" AutoDataBind="false" />
+
         </div>
     </form>
 </body>

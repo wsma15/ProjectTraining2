@@ -1,22 +1,199 @@
 ﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
 using DevExpress.Web;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Web.UI.WebControls;
 
 namespace LoginApp
 {
     public partial class Dashboard : System.Web.UI.Page
     {
         readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
+        protected void UsersbtnExportPDF_Click(object sender, EventArgs e)
+        {
+            // Fetch data from UsersGridView
+            DataTable dataTable = GetUsersDataFromGridView();
 
+            // Create a new ReportDocument
+            ReportDocument rptDoc = new ReportDocument();
+
+            // Load the report file
+            string reportPath = Server.MapPath("~/UsersReport.rpt");
+            rptDoc.Load(reportPath);
+
+            // Set the data source for the report
+            rptDoc.SetDataSource(dataTable);
+
+            // Define the export path and ensure the directory exists
+            string directoryPath = Server.MapPath("~/Reports");
+            string filePath = Path.Combine(directoryPath, "UsersReport.pdf");
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            // Export the report to PDF
+            ExportOptions exportOptions = new ExportOptions();
+            DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
+            PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
+
+            diskOptions.DiskFileName = filePath;
+            exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+            exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+            exportOptions.DestinationOptions = diskOptions;
+            exportOptions.FormatOptions = pdfOptions;
+
+            try
+            {
+                rptDoc.Export(exportOptions);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the error
+                throw new Exception("An error occurred while exporting the report.", ex);
+            }
+
+            // Optionally, prompt the user to download the file
+            FileInfo file = new FileInfo(filePath);
+            if (file.Exists)
+            {
+                Response.Clear();
+                Response.Buffer = true;
+                Response.AddHeader("content-disposition", "attachment;filename=" + file.Name);
+                Response.AddHeader("content-length", file.Length.ToString());
+                Response.ContentType = "application/pdf";
+                Response.WriteFile(file.FullName);
+                Response.End();
+            }
+        }
+        protected void RolesbtnExportPDF_Click(object sender, EventArgs e)
+        {
+            // Fetch data from RolesGridView
+            DataTable dataTable = GetRolesDataFromGridView();
+
+            // Create a new ReportDocument
+            ReportDocument rptDoc = new ReportDocument();
+
+            // Load the report file
+            string reportPath = Server.MapPath("~/RolesReport.rpt");
+            rptDoc.Load(reportPath);
+
+            // Set the data source for the report
+            rptDoc.SetDataSource(dataTable);
+
+            // Define the export path and ensure the directory exists
+            string directoryPath = Server.MapPath("~/Reports");
+            string filePath = Path.Combine(directoryPath, "RolesReport.pdf");
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            // Export the report to PDF
+            ExportOptions exportOptions = new ExportOptions();
+            DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
+            PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
+
+            diskOptions.DiskFileName = filePath;
+            exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+            exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+            exportOptions.DestinationOptions = diskOptions;
+            exportOptions.FormatOptions = pdfOptions;
+
+            try
+            {
+                rptDoc.Export(exportOptions);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the error
+                throw new Exception("An error occurred while exporting the report.", ex);
+            }
+
+            // Optionally, prompt the user to download the file
+            FileInfo file = new FileInfo(filePath);
+            if (file.Exists)
+            {
+                Response.Clear();
+                Response.Buffer = true;
+                Response.AddHeader("content-disposition", "attachment;filename=" + file.Name);
+                Response.AddHeader("content-length", file.Length.ToString());
+                Response.ContentType = "application/pdf";
+                Response.WriteFile(file.FullName);
+                Response.Flush(); // Ensure all data is sent
+                Response.SuppressContent = true; // Suppress further content
+            }
+        }
+
+        private DataTable GetRolesDataFromGridView()
+        {
+            DataTable dt = new DataTable();
+
+            dt.Columns.Add("id", typeof(int));
+            dt.Columns.Add("Name", typeof(string));
+
+            // Fetch data from GridView
+            var dataSource = RolesGridView.DataSource as DataTable;
+
+            if (dataSource != null)
+            {
+                foreach (DataRow row in dataSource.Rows)
+                {
+                    DataRow dr = dt.NewRow();
+                    dr["id"] = Convert.ToInt32(row["id"]);
+                    dr["Name"] = row["Name"].ToString();
+                    dt.Rows.Add(dr);
+                }
+            }
+            else
+            {
+                // Handle the case where dataSource is null
+                System.Diagnostics.Debug.WriteLine("datasource null!!!!!!");
+            }
+
+            return dt;
+        }
+
+
+        private DataTable GetUsersDataFromGridView()
+        {
+            DataTable dt = new DataTable();
+
+            // Define columns for DataTable based on your GridView's columns
+            dt.Columns.Add("Username", typeof(string));
+            dt.Columns.Add("Password", typeof(string));
+            dt.Columns.Add("RoleId", typeof(int));
+
+            // Assuming your ASPxGridView is bound to a DataSource
+            // You can directly access the DataSource as a DataTable or DataSet
+            // Cast it if necessary, or use GridView's data source
+            var dataSource = UsersGridView.DataSource as DataTable;
+
+            if (dataSource != null)
+            {
+                foreach (DataRow row in dataSource.Rows)
+                {
+                    DataRow dr = dt.NewRow();
+                    dr["Username"] = row["Username"].ToString();
+                    dr["Password"] = row["Password"].ToString();
+                    dr["RoleId"] = Convert.ToInt32(row["RoleId"]);
+                    dt.Rows.Add(dr);
+                }
+            }
+
+            return dt;
+        }
         private void BindUsersGridView()
         {
             ReportDocument rptdoc= new ReportDocument();
             rptdoc.Load(Server.MapPath("~/UsersReport.rpt"));
-string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
-
+            string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -38,8 +215,6 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                 UsersGridView.DataBind();
                 UsersGridView.EnableViewState = false;
             }
-            Report.ReportSource = rptdoc;
-            Report.DataBind();
         }
 
         private bool IsValidUsername(string username)
@@ -260,7 +435,7 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
 
         protected void RolesGridView_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
         {
-            string RoleId = e.Keys["id"].ToString();
+            string RoleId = e.Keys["Id"].ToString();
             string roleName = e.NewValues["Name"].ToString();
 
             string query = "UPDATE [dbo].[Roles] SET Name = @Name WHERE id = @id";

@@ -42,6 +42,15 @@ namespace LoginApp
         protected global::DevExpress.Web.ASPxGridView RolesGridView;
 
         /// <summary>
+        /// RolesbtnExportPDF control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button RolesbtnExportPDF;
+
+        /// <summary>
         /// UsersGridView control.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace LoginApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::DevExpress.Web.ASPxGridView UsersGridView;
+
+        /// <summary>
+        /// UsersbtnExportPDF control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button UsersbtnExportPDF;
 
         /// <summary>
         /// RoleDataSource control.
@@ -67,14 +85,5 @@ namespace LoginApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.SqlDataSource UserDataSource;
-
-        /// <summary>
-        /// Report control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::CrystalDecisions.Web.CrystalReportViewer Report;
     }
 }
