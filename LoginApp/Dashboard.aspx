@@ -13,17 +13,17 @@
                     <dx:TabPage Name="RolePage" Text="Role">
                         <ContentCollection>
                             <dx:ContentControl runat="server">
-                                <dx:ASPxGridView ID="RolesGridView" runat="server" KeyFieldName="RoleId" AutoGenerateColumns="true"
+                                <dx:ASPxGridView ID="RolesGridView" runat="server" KeyFieldName="Id" AutoGenerateColumns="true"
                                     OnRowDeleting="RolesGridView_RowDeleting"
                                     OnRowInserting="RolesGridView_RowInserting" OnRowValidating="RolesGridView_RowValidating"
                                     OnRowUpdating="RolesGridView_RowUpdating" EnableCallBacks="true" Theme="Default">
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn ShowEditButton="True" VisibleIndex="0" ShowNewButtonInHeader="True" ShowDeleteButton="True" />
-                                        <dx:GridViewDataTextColumn FieldName="RoleId" Caption="Role ID" VisibleIndex="1">
+                                        <dx:GridViewDataTextColumn FieldName="Id" Caption="Role ID" VisibleIndex="1">
                                             <EditFormSettings Visible="False" />
                                         </dx:GridViewDataTextColumn>
-                                        <dx:GridViewDataTextColumn FieldName="RoleName" Caption="Role Name" VisibleIndex="2" />
+                                        <dx:GridViewDataTextColumn FieldName="Name" Caption="Role Name" VisibleIndex="2" />
                                     </Columns>
                                 </dx:ASPxGridView>
                             </dx:ContentControl>
@@ -33,25 +33,25 @@
                     <dx:TabPage Name="UsersPage" Text="Users">
                         <ContentCollection>
                             <dx:ContentControl runat="server">
-                                <dx:ASPxGridView ID="UsersGridView" runat="server" AutoGenerateColumns="false" KeyFieldName="Username"
+                                <dx:ASPxGridView ID="UsersGridView" runat="server"
+                                    AutoGenerateColumns="false"
+                                    KeyFieldName="Username"
                                     OnRowInserting="UsersGridView_RowInserting"
                                     OnRowUpdating="UsersGridView_RowUpdating"
-                                    OnRowDeleting="UsersGridView_RowDeleting"  OnCustomCallback="UsersGridView_CustomCallback"
-                                    EnableRowsCache="false" OnRowValidating="UsersGridView_RowValidating"
-                                   
-                                    EnableCallBacks="True"
-                                    Theme="Default">
+                                    OnRowDeleting="UsersGridView_RowDeleting" OnRowValidating="UsersGridView_RowValidating"
+                                    EnableRowsCache="false"
 
-                                    <Settings ShowFilterRow="True" ShowGroupPanel="True" />
-                                    <SettingsSearchPanel Visible="True" />
-                                    <SettingsBehavior AllowSort="True" />
+                                    EnableCallBacks="true"
+                                    Theme="Default">
+                                    <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
-                                        <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" ShowClearFilterButton="True" SelectAllCheckboxMode="Page" ShowSelectCheckbox="True" />
+                                        <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" />
                                         <dx:GridViewDataTextColumn FieldName="Username" Caption="Username" VisibleIndex="1" />
                                         <dx:GridViewDataTextColumn FieldName="Password" Caption="Password" VisibleIndex="2" />
-                                        <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role" VisibleIndex="3">
-                                            <PropertiesComboBox DataSourceID="RoleDataSource" TextField="RoleName" ValueField="RoleId" />
+                                <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role"  VisibleIndex="3" ReadOnly="false" PropertiesComboBox-DataSourceID="RoleDataSource" PropertiesComboBox-TextField="Name" PropertiesComboBox-ValueField="Id" LoadReadOnlyValueFromDataModel="false">
                                         </dx:GridViewDataComboBoxColumn>
+
+
                                     </Columns>
                                 </dx:ASPxGridView>
                             </dx:ContentControl>
@@ -59,9 +59,14 @@
                     </dx:TabPage>
                 </TabPages>
             </dx:ASPxPageControl>
+
             <asp:SqlDataSource ID="RoleDataSource" runat="server"
                 ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True"
-                SelectCommand="SELECT RoleId, RoleName FROM [dbo].[Roles]" />
+                SelectCommand="SELECT Id, Name FROM [dbo].[Roles]" />
+
+            <asp:SqlDataSource ID="UserDataSource" runat="server"
+                ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True"
+                SelectCommand="SELECT Username, Password, RoleId FROM [dbo].[Users]" />
         </div>
     </form>
 </body>

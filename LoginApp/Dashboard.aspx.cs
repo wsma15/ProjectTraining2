@@ -8,11 +8,11 @@ namespace LoginApp
 {
     public partial class Dashboard : System.Web.UI.Page
     {
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
+        readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
 
         private void BindUsersGridView()
         {
-            string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
+string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -55,7 +55,7 @@ namespace LoginApp
             return regex.IsMatch(password);
         }
 
-        private bool IsRoleAssignedToUsers(int roleId)
+        private bool IsRoleAssignedToUsers(int RoleId)
         {
             bool isAssigned = false;
             string query = "SELECT COUNT(*) FROM [dbo].[Users] WHERE RoleId = @RoleId";
@@ -63,7 +63,7 @@ namespace LoginApp
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@RoleId", roleId);
+                cmd.Parameters.AddWithValue("@RoleId", RoleId);
 
                 conn.Open();
                 int count = (int)cmd.ExecuteScalar();
@@ -76,18 +76,17 @@ namespace LoginApp
 
         private void BindRolesGridView()
         {
-            string query = "SELECT RoleId, RoleName FROM [dbo].[Roles]";
-
+            string query = "SELECT Id, Name FROM Roles"; 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(query, conn);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
+
+                
                 RolesGridView.DataSource = dt;
                 RolesGridView.DataBind();
-                RolesGridView.EnableViewState = false;
-
             }
         }
 
@@ -105,7 +104,7 @@ namespace LoginApp
                 BindRolesGridView();
             }
         }
- 
+
         protected void UsersGridView_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
             if (e.NewValues["Username"] != null && e.NewValues["Password"] != null)
@@ -113,7 +112,14 @@ namespace LoginApp
                 string username = e.NewValues["Username"].ToString();
                 string password = e.NewValues["Password"].ToString();
                 string hashedPassword = PasswordHelper.HashPassword(password);
-                int roleId = Convert.ToInt32(e.NewValues["RoleId"]);
+                var RoleId = e.NewValues["RoleId"]; // Use the exact name of the field
+
+                if (RoleId == null)
+                {
+                    e.Cancel = true;
+                    UsersGridView.JSProperties["cpMessage"] = "Role ID is missing.";
+                    return;
+                }
 
                 if (!IsValidUsername(username))
                 {
@@ -136,7 +142,7 @@ namespace LoginApp
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@Password", hashedPassword);
-                    cmd.Parameters.AddWithValue("@RoleId", roleId);
+                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value); // Use DBNull.Value if RoleId is null
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -153,7 +159,7 @@ namespace LoginApp
         {
             string username = e.Keys["Username"].ToString();
             string password = e.NewValues["Password"].ToString();
-            int roleId = Convert.ToInt32(e.NewValues["RoleId"]);
+            int RoleId = Convert.ToInt32(e.NewValues["RoleId"]);
 
             string query = "UPDATE [dbo].[Users] SET Password = @Password, RoleId = @RoleId WHERE Username = @Username";
 
@@ -162,7 +168,7 @@ namespace LoginApp
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@Username", username);
                 cmd.Parameters.AddWithValue("@Password", PasswordHelper.HashPassword(password));
-                cmd.Parameters.AddWithValue("@RoleId", roleId);
+                cmd.Parameters.AddWithValue("@RoleId", RoleId);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -226,16 +232,16 @@ namespace LoginApp
 
         protected void RolesGridView_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
-            if (e.NewValues["RoleName"] != null)
+            if (e.NewValues["Name"] != null)
             {
-                string roleName = e.NewValues["RoleName"].ToString();
+                string roleName = e.NewValues["Name"].ToString();
 
-                string query = "INSERT INTO [dbo].[Roles] (RoleName) VALUES (@RoleName)";
+                string query = "INSERT INTO [dbo].[Roles] (Name) VALUES (@Name)";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@RoleName", roleName);
+                    cmd.Parameters.AddWithValue("@Name", roleName);
                     conn.Open();
                     cmd.ExecuteNonQuery();
                     conn.Close();
@@ -249,16 +255,16 @@ namespace LoginApp
 
         protected void RolesGridView_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
         {
-            string roleId = e.Keys["RoleId"].ToString();
-            string roleName = e.NewValues["RoleName"].ToString();
+            string RoleId = e.Keys["id"].ToString();
+            string roleName = e.NewValues["Name"].ToString();
 
-            string query = "UPDATE [dbo].[Roles] SET RoleName = @RoleName WHERE RoleId = @RoleId";
+            string query = "UPDATE [dbo].[Roles] SET Name = @Name WHERE id = @id";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@RoleName", roleName);
-                cmd.Parameters.AddWithValue("@RoleId", roleId);
+                cmd.Parameters.AddWithValue("@Name", roleName);
+                cmd.Parameters.AddWithValue("@id", RoleId);
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 conn.Close();
@@ -271,10 +277,10 @@ namespace LoginApp
 
         protected void RolesGridView_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
         {
-            int roleId = Convert.ToInt32(e.Keys["RoleId"]);
+            int RoleId = Convert.ToInt32(e.Keys["Id"]);
 
             // Check if the role is assigned to any users
-            if (IsRoleAssignedToUsers(roleId))
+            if (IsRoleAssignedToUsers(RoleId))
             {
                 // Display a message to the user
                 RolesGridView.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
@@ -283,12 +289,12 @@ namespace LoginApp
             else
             {
                 // Proceed with deletion
-                string query = "DELETE FROM [dbo].[Roles] WHERE RoleId = @RoleId";
+                string query = "DELETE FROM [dbo].[Roles] WHERE Id = @id";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@RoleId", roleId);
+                    cmd.Parameters.AddWithValue("@id", RoleId);
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -305,16 +311,16 @@ namespace LoginApp
         protected void RolesGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
         {
             // Check if the "RoleName" value is null
-            if (e.NewValues["RoleName"] == null)
+            if (e.NewValues["Name"] == null)
             {
-                e.Errors[RolesGridView.Columns["RoleName"]] = "Value cannot be null.";
+                e.Errors[RolesGridView.Columns["Name"]] = "Value cannot be null.";
             }
             else
             {
                 // Validate the "RoleName" value using the IsValidName method
-                if (!IsValidName(e.NewValues["RoleName"].ToString()))
+                if (!IsValidName(e.NewValues["Name"].ToString()))
                 {
-                    e.Errors[RolesGridView.Columns["RoleName"]] = "The name must contain only letters and have at least two words.";
+                    e.Errors[RolesGridView.Columns["Name"]] = "The name must contain only letters and have at least two words.";
                 }
             }
 
