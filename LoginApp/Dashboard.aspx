@@ -1,5 +1,7 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="LoginApp.Dashboard" %>
 
+<%@ Register Assembly="CrystalDecisions.Web, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" Namespace="CrystalDecisions.Web" TagPrefix="CR" %>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
@@ -67,6 +69,7 @@
             <asp:SqlDataSource ID="UserDataSource" runat="server"
                 ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True"
                 SelectCommand="SELECT Username, Password, RoleId FROM [dbo].[Users]" />
+<CR:CrystalReportViewer ID="Report" runat="server" AutoDataBind="false" />
         </div>
     </form>
 </body>

@@ -1,4 +1,5 @@
-﻿using DevExpress.Web;
+﻿using CrystalDecisions.CrystalReports.Engine;
+using DevExpress.Web;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -12,6 +13,8 @@ namespace LoginApp
 
         private void BindUsersGridView()
         {
+            ReportDocument rptdoc= new ReportDocument();
+            rptdoc.Load(Server.MapPath("~/UsersReport.rpt"));
 string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -35,6 +38,8 @@ string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
                 UsersGridView.DataBind();
                 UsersGridView.EnableViewState = false;
             }
+            Report.ReportSource = rptdoc;
+            Report.DataBind();
         }
 
         private bool IsValidUsername(string username)
