@@ -15,21 +15,18 @@ namespace LoginApp
         readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
         protected void UsersbtnExportPDF_Click(object sender, EventArgs e)
         {
-            // Fetch data from UsersGridView
             DataTable dataTable = GetUsersDataFromGridView();
 
-            // Create a new ReportDocument
             ReportDocument rptDoc = new ReportDocument();
 
-            // Load the report file
             string reportPath = Server.MapPath("~/UsersReport.rpt");
+            
             rptDoc.Load(reportPath);
 
-            // Set the data source for the report
             rptDoc.SetDataSource(dataTable);
 
-            // Define the export path and ensure the directory exists
             string directoryPath = Server.MapPath("~/Reports");
+            
             string filePath = Path.Combine(directoryPath, "UsersReport.pdf");
 
             if (!Directory.Exists(directoryPath))
@@ -37,57 +34,64 @@ namespace LoginApp
                 Directory.CreateDirectory(directoryPath);
             }
 
-            // Export the report to PDF
             ExportOptions exportOptions = new ExportOptions();
+            
             DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
+            
             PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
 
             diskOptions.DiskFileName = filePath;
+            
             exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+            
             exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+            
             exportOptions.DestinationOptions = diskOptions;
+            
             exportOptions.FormatOptions = pdfOptions;
-
+            
             try
             {
                 rptDoc.Export(exportOptions);
             }
             catch (Exception ex)
             {
-                // Log or handle the error
                 throw new Exception("An error occurred while exporting the report.", ex);
             }
 
-            // Optionally, prompt the user to download the file
             FileInfo file = new FileInfo(filePath);
+            
             if (file.Exists)
             {
                 Response.Clear();
+            
                 Response.Buffer = true;
+                
                 Response.AddHeader("content-disposition", "attachment;filename=" + file.Name);
+                
                 Response.AddHeader("content-length", file.Length.ToString());
+                
                 Response.ContentType = "application/pdf";
+                
                 Response.WriteFile(file.FullName);
+                
                 Response.End();
             }
         }
         protected void RolesbtnExportPDF_Click(object sender, EventArgs e)
-        {
-            // Fetch data from RolesGridView
+        { 
             DataTable dataTable = GetRolesDataFromGridView();
 
-            // Create a new ReportDocument
             ReportDocument rptDoc = new ReportDocument();
 
-            // Load the report file
             string reportPath = Server.MapPath("~/RolesReport.rpt");
+
             rptDoc.Load(reportPath);
 
-            // Set the data source for the report
             rptDoc.SetDataSource(dataTable);
 
-            // Define the export path and ensure the directory exists
             string directoryPath = Server.MapPath("~/Reports");
+
             string filePath = Path.Combine(directoryPath, "RolesReport.pdf");
 
             if (!Directory.Exists(directoryPath))
@@ -95,15 +99,20 @@ namespace LoginApp
                 Directory.CreateDirectory(directoryPath);
             }
 
-            // Export the report to PDF
             ExportOptions exportOptions = new ExportOptions();
+
             DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
+
             PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
 
             diskOptions.DiskFileName = filePath;
+
             exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+
             exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+
             exportOptions.DestinationOptions = diskOptions;
+
             exportOptions.FormatOptions = pdfOptions;
 
             try
@@ -112,11 +121,9 @@ namespace LoginApp
             }
             catch (Exception ex)
             {
-                // Log or handle the error
                 throw new Exception("An error occurred while exporting the report.", ex);
             }
 
-            // Optionally, prompt the user to download the file
             FileInfo file = new FileInfo(filePath);
             if (file.Exists)
             {
@@ -126,8 +133,8 @@ namespace LoginApp
                 Response.AddHeader("content-length", file.Length.ToString());
                 Response.ContentType = "application/pdf";
                 Response.WriteFile(file.FullName);
-                Response.Flush(); // Ensure all data is sent
-                Response.SuppressContent = true; // Suppress further content
+                Response.Flush();
+                Response.SuppressContent = true;
             }
         }
 
@@ -138,7 +145,6 @@ namespace LoginApp
             dt.Columns.Add("id", typeof(int));
             dt.Columns.Add("Name", typeof(string));
 
-            // Fetch data from GridView
             var dataSource = RolesGridView.DataSource as DataTable;
 
             if (dataSource != null)
@@ -153,8 +159,7 @@ namespace LoginApp
             }
             else
             {
-                // Handle the case where dataSource is null
-                System.Diagnostics.Debug.WriteLine("datasource null!!!!!!");
+                System.Diagnostics.Debug.WriteLine("Data Source Null.");
             }
 
             return dt;
@@ -165,14 +170,10 @@ namespace LoginApp
         {
             DataTable dt = new DataTable();
 
-            // Define columns for DataTable based on your GridView's columns
             dt.Columns.Add("Username", typeof(string));
             dt.Columns.Add("Password", typeof(string));
             dt.Columns.Add("RoleId", typeof(int));
 
-            // Assuming your ASPxGridView is bound to a DataSource
-            // You can directly access the DataSource as a DataTable or DataSet
-            // Cast it if necessary, or use GridView's data source
             var dataSource = UsersGridView.DataSource as DataTable;
 
             if (dataSource != null)
@@ -191,7 +192,7 @@ namespace LoginApp
         }
         private void BindUsersGridView()
         {
-            ReportDocument rptdoc= new ReportDocument();
+            ReportDocument rptdoc = new ReportDocument();
             rptdoc.Load(Server.MapPath("~/UsersReport.rpt"));
             string query = "SELECT Username, Password, RoleId FROM [dbo].[Users]";
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -201,7 +202,7 @@ namespace LoginApp
                 DataTable dt = new DataTable();
 
                 conn.Open();
-                da.Fill(dt); 
+                da.Fill(dt);
                 conn.Close();
 
                 foreach (DataRow row in dt.Rows)
@@ -256,7 +257,7 @@ namespace LoginApp
 
         private void BindRolesGridView()
         {
-            string query = "SELECT Id, Name FROM Roles"; 
+            string query = "SELECT Id, Name FROM Roles";
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -264,7 +265,7 @@ namespace LoginApp
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
-                
+
                 RolesGridView.DataSource = dt;
                 RolesGridView.DataBind();
             }
@@ -292,7 +293,7 @@ namespace LoginApp
                 string username = e.NewValues["Username"].ToString();
                 string password = e.NewValues["Password"].ToString();
                 string hashedPassword = PasswordHelper.HashPassword(password);
-                var RoleId = e.NewValues["RoleId"]; 
+                var RoleId = e.NewValues["RoleId"];
 
                 if (RoleId == null)
                 {
@@ -322,7 +323,7 @@ namespace LoginApp
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@Password", hashedPassword);
-                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value); 
+                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value);
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -359,7 +360,7 @@ namespace LoginApp
             UsersGridView.CancelEdit();
             BindUsersGridView();
         }
-   
+
         protected void UsersGridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine($"CustomCallback triggered. Parameters: {e.Parameters}");
@@ -462,7 +463,7 @@ namespace LoginApp
             if (IsRoleAssignedToUsers(RoleId))
             {
                 RolesGridView.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
-                e.Cancel = true; 
+                e.Cancel = true;
             }
             else
             {
@@ -483,7 +484,7 @@ namespace LoginApp
             }
         }
 
-        
+
         protected void RolesGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
         {
             if (e.NewValues["Name"] == null)
