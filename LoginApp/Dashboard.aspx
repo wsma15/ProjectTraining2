@@ -19,6 +19,7 @@
                                     OnRowDeleting="RolesGridView_RowDeleting"
                                     OnRowInserting="RolesGridView_RowInserting" OnRowValidating="RolesGridView_RowValidating"
                                     OnRowUpdating="RolesGridView_RowUpdating" EnableCallBacks="true" Theme="Default">
+                                    <SettingsSearchPanel Visible="True"></SettingsSearchPanel>
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn ShowEditButton="True" VisibleIndex="0" ShowNewButtonInHeader="True" ShowDeleteButton="True" />
@@ -46,6 +47,7 @@
                                     EnableRowsCache="false"
                                     EnableCallBacks="true"
                                     Theme="Default">
+                                    <SettingsSearchPanel Visible="True"></SettingsSearchPanel>
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" />

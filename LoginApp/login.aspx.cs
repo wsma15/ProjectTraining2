@@ -18,7 +18,6 @@ namespace LoginApp
                 string password = Passwordtxt.Text;
                 string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=TrainingApp;Trusted_Connection=True;";
 
-                // Fetch the stored password hash and role ID
                 string query = "SELECT Password, RoleId FROM Users WHERE Username = @Username";
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -34,10 +33,8 @@ namespace LoginApp
                         string storedHash = reader["Password"].ToString();
                         int roleId = Convert.ToInt32(reader["RoleId"]);
 
-                        // Verify the password
                         if (password==PasswordHelper.Decrypt( storedHash))
                         {
-                            // Redirect based on role
                             switch (roleId)
                             {
                                 case 1:
