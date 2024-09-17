@@ -6,16 +6,80 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace LoginApp
 {
     public partial class Dashboard : System.Web.UI.Page
     {
+
         readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True";
+
+        protected DataTable GetUsersDataFromProcedure()
+        {
+            DataTable dt = new DataTable();
+
+            string storedProcedureName = "RetriveUsers";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(storedProcedureName, conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+
+            return dt;
+        }
+
+        protected DataTable GetRolesDataFromProcedure()
+        {
+            DataTable dt = new DataTable();
+
+            string storedProcedureName = "RetriveRoles";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(storedProcedureName, conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+
+            return dt;
+        }
+
         protected void UsersbtnExportPDF_Click(object sender, EventArgs e)
         {
-            DataTable dataTable = GetUsersDataFromGridView();
+            DataTable dataTable = GetUsersDataFromProcedure();
 
             ReportDocument rptDoc = new ReportDocument();
 
@@ -43,7 +107,7 @@ namespace LoginApp
             diskOptions.DiskFileName = filePath;
             
             exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
-            
+
             exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
             
             exportOptions.DestinationOptions = diskOptions;
@@ -78,9 +142,10 @@ namespace LoginApp
                 Response.End();
             }
         }
+
         protected void RolesbtnExportPDF_Click(object sender, EventArgs e)
         { 
-            DataTable dataTable = GetRolesDataFromGridView();
+            DataTable dataTable = GetRolesDataFromProcedure();
 
             ReportDocument rptDoc = new ReportDocument();
 
@@ -138,58 +203,7 @@ namespace LoginApp
             }
         }
 
-        private DataTable GetRolesDataFromGridView()
-        {
-            DataTable dt = new DataTable();
 
-            dt.Columns.Add("id", typeof(int));
-            dt.Columns.Add("Name", typeof(string));
-
-            var dataSource = RolesGridView.DataSource as DataTable;
-
-            if (dataSource != null)
-            {
-                foreach (DataRow row in dataSource.Rows)
-                {
-                    DataRow dr = dt.NewRow();
-                    dr["id"] = Convert.ToInt32(row["id"]);
-                    dr["Name"] = row["Name"].ToString();
-                    dt.Rows.Add(dr);
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Data Source Null.");
-            }
-
-            return dt;
-        }
-
-
-        private DataTable GetUsersDataFromGridView()
-        {
-            DataTable dt = new DataTable();
-
-            dt.Columns.Add("Username", typeof(string));
-            dt.Columns.Add("Password", typeof(string));
-            dt.Columns.Add("RoleId", typeof(int));
-
-            var dataSource = UsersGridView.DataSource as DataTable;
-
-            if (dataSource != null)
-            {
-                foreach (DataRow row in dataSource.Rows)
-                {
-                    DataRow dr = dt.NewRow();
-                    dr["Username"] = row["Username"].ToString();
-                    dr["Password"] = row["Password"].ToString();
-                    dr["RoleId"] = Convert.ToInt32(row["RoleId"]);
-                    dt.Rows.Add(dr);
-                }
-            }
-
-            return dt;
-        }
         private void BindUsersGridView()
         {
             ReportDocument rptdoc = new ReportDocument();
@@ -316,17 +330,39 @@ namespace LoginApp
                     return;
                 }
 
-                string query = "INSERT INTO [dbo].[Users] (Username, Password, RoleId) VALUES (@Username, @Password, @RoleId)";
+                // Check if username already exists
+                string checkQuery = "SELECT COUNT(1) FROM [dbo].[Users] WHERE Username = @Username";
+                bool usernameExists = false;
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@Username", username);
-                    cmd.Parameters.AddWithValue("@Password", hashedPassword);
-                    cmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value);
+                    SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
+                    checkCmd.Parameters.AddWithValue("@Username", username);
 
                     conn.Open();
-                    cmd.ExecuteNonQuery();
+                    usernameExists = Convert.ToBoolean(checkCmd.ExecuteScalar());
+                    conn.Close();
+                }
+
+                if (usernameExists)
+                {
+                    e.Cancel = true;
+                    UsersGridView.JSProperties["cpMessage"] = "Username already exists. Please choose a different username.";
+                    return;
+                }
+
+                // Insert the new user if the username does not exist
+                string insertQuery = "INSERT INTO [dbo].[Users] (Username, Password, RoleId) VALUES (@Username, @Password, @RoleId)";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    SqlCommand insertCmd = new SqlCommand(insertQuery, conn);
+                    insertCmd.Parameters.AddWithValue("@Username", username);
+                    insertCmd.Parameters.AddWithValue("@Password", hashedPassword);
+                    insertCmd.Parameters.AddWithValue("@RoleId", RoleId ?? DBNull.Value);
+
+                    conn.Open();
+                    insertCmd.ExecuteNonQuery();
                     conn.Close();
                 }
 
@@ -462,6 +498,7 @@ namespace LoginApp
 
             if (IsRoleAssignedToUsers(RoleId))
             {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "script", "alert('Cannot delete the role as it is assigned to one or more users.')",true);
                 RolesGridView.JSProperties["cpMessage"] = "Cannot delete the role as it is assigned to one or more users.";
                 e.Cancel = true;
             }
@@ -484,7 +521,6 @@ namespace LoginApp
             }
         }
 
-
         protected void RolesGridView_RowValidating(object sender, DevExpress.Web.Data.ASPxDataValidationEventArgs e)
         {
             if (e.NewValues["Name"] == null)
@@ -503,6 +539,11 @@ namespace LoginApp
             {
                 e.RowError = "Please fill in all fields correctly.";
             }
+        }
+
+        protected void UsersGridView_DataBinding(object sender, EventArgs e)
+        {
+
         }
     }
 }
