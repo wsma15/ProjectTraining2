@@ -31,7 +31,6 @@
                                         <dx:GridViewDataTextColumn FieldName="Name" Caption="Name" VisibleIndex="2" />
                                     </Columns>
                                 </dx:ASPxGridView>
-                                <asp:Button ID="RolesbtnExportPDF" runat="server" Text="Export to PDF" OnClick="RolesbtnExportPDF_Click" />
                             </dx:ContentControl>
                         </ContentCollection>
                     </dx:TabPage>
@@ -59,8 +58,7 @@
                                         </dx:GridViewDataComboBoxColumn>
                                     </Columns>
                                 </dx:ASPxGridView>
-                                <asp:Button ID="UsersbtnExportPDF" runat="server" Text="Export to PDF" OnClick="UsersbtnExportPDF_Click" />
-                            </dx:ContentControl>
+                                </dx:ContentControl>
                         </ContentCollection>
                     </dx:TabPage>
                 </TabPages>
@@ -72,6 +70,8 @@
                 ConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=TrainingApp;Integrated Security=True"
                 SelectCommand="SELECT Username, Password, RoleId FROM [dbo].[Users]" />
         </div>
+        <div>   <asp:Button ID="UsersbtnExportPDF" runat="server" Text="Export to PDF" OnClick="UsersbtnExportPDF_Click" />
+                         </div>
     </form>
 </body>
 </html>
