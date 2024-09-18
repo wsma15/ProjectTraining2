@@ -18,7 +18,8 @@
                                 <dx:ASPxGridView ID="RolesGridView" runat="server" KeyFieldName="Id" AutoGenerateColumns="true"
                                     OnRowDeleting="RolesGridView_RowDeleting"
                                     OnRowInserting="RolesGridView_RowInserting" OnRowValidating="RolesGridView_RowValidating"
-                                    OnRowUpdating="RolesGridView_RowUpdating" EnableCallBacks="true" Theme="Default">
+                                    OnRowUpdating="RolesGridView_RowUpdating" EnableCallBacks="true" Theme="Default"
+                                    OnDataBinding="RolesGridView_DataBinding">
                                     <Settings ShowGroupPanel="True" ShowFilterRow="True"></Settings>
                                     <SettingsSearchPanel Visible="True"></SettingsSearchPanel>
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
@@ -40,7 +41,7 @@
                                 <dx:ASPxGridView ID="UsersGridView" runat="server"
                                     AutoGenerateColumns="false"
                                     KeyFieldName="Username"
-                                    OnDataBinding ="UsersGridView_DataBinding"
+                                    OnDataBinding="UsersGridView_DataBinding"
                                     OnRowInserting="UsersGridView_RowInserting"
                                     OnRowUpdating="UsersGridView_RowUpdating"
                                     OnRowDeleting="UsersGridView_RowDeleting" OnRowValidating="UsersGridView_RowValidating"
@@ -52,8 +53,8 @@
                                     <SettingsDataSecurity AllowEdit="true" AllowInsert="true" AllowDelete="true" />
                                     <Columns>
                                         <dx:GridViewCommandColumn VisibleIndex="0" ShowEditButton="True" ShowDeleteButton="True" ShowNewButton="True" ShowNewButtonInHeader="True" ShowClearFilterButton="True" SelectAllCheckboxMode="Page" ShowSelectCheckbox="True" />
-                                        <dx:GridViewDataTextColumn FieldName="Username" Caption="Username" VisibleIndex="1" />
-                                        <dx:GridViewDataTextColumn FieldName="Password" Caption="Password" VisibleIndex="2" />
+                                        <dx:GridViewDataTextColumn FieldName="Username" Caption="Username" VisibleIndex="1" ReadOnly="false" LoadReadOnlyValueFromDataModel="false"/>
+                                        <dx:GridViewDataTextColumn FieldName="Password" Caption="Password" VisibleIndex="2" ReadOnly="false" LoadReadOnlyValueFromDataModel="false" />
                                         <dx:GridViewDataComboBoxColumn FieldName="RoleId" Caption="Role" VisibleIndex="3" ReadOnly="false" PropertiesComboBox-DataSourceID="RoleDataSource" PropertiesComboBox-TextField="Name" PropertiesComboBox-ValueField="Id" LoadReadOnlyValueFromDataModel="false">
                                         </dx:GridViewDataComboBoxColumn>
                                     </Columns>
