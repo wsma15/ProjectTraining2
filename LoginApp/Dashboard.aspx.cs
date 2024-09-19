@@ -1,4 +1,6 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+﻿
+using ClassLibrary1;
+using CrystalDecisions.CrystalReports.Engine;
 using CrystalDecisions.Shared;
 using DevExpress.Web;
 using System;
@@ -69,8 +71,8 @@ namespace LoginApp
         }
 
         protected void UsersbtnExportPDF_Click(object sender, EventArgs e)
-{
-    DataTable dataTable = GetUsersDataFromProcedure(); // Get data from stored procedure
+        {
+            DataTable dataTable = GetUsersDataFromProcedure(); // Get data from stored procedure
             if (dataTable == null || dataTable.Rows.Count == 0)
             {
                 System.Diagnostics.Debug.WriteLine("The DataTable is empty. No data returned from the procedure.");
@@ -82,45 +84,45 @@ namespace LoginApp
             }
 
             ReportDocument rptDoc = new ReportDocument();
-    string reportPath = Server.MapPath("~/UsersReport.rpt"); // Path to Crystal Report file
-    rptDoc.Load(reportPath); // Load the Crystal Report
-    rptDoc.SetDataSource(dataTable); // Set data source to the DataTable
+            string reportPath = Server.MapPath("~/UsersReport.rpt"); // Path to Crystal Report file
+            rptDoc.Load(reportPath); // Load the Crystal Report
+            rptDoc.SetDataSource(dataTable); // Set data source to the DataTable
 
-    string directoryPath = Server.MapPath("~/Reports");
-    string filePath = Path.Combine(directoryPath, "UsersReport.pdf");
-    if (!Directory.Exists(directoryPath))
-    {
-        Directory.CreateDirectory(directoryPath); // Create directory if not exists
-    }
-            
-    ExportOptions exportOptions = new ExportOptions();
-    DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
-    PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
-    diskOptions.DiskFileName = filePath;
-    exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
-    exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
-    exportOptions.DestinationOptions = diskOptions;
-    exportOptions.FormatOptions = pdfOptions;
-    try
-    {
-        rptDoc.Export(exportOptions);
-    }
-    catch (Exception ex)
-    {
-        throw new Exception("An error occurred while exporting the report.", ex);
-    }
-    FileInfo file = new FileInfo(filePath);
-    if (file.Exists)
-    {
-        Response.Clear();
-        Response.Buffer = true;
-        Response.AddHeader("content-disposition", "attachment;filename=" + file.Name);
-        Response.AddHeader("content-length", file.Length.ToString());
-        Response.ContentType = "application/pdf";
-        Response.WriteFile(file.FullName);
-        Response.End();
-    }
-}
+            string directoryPath = Server.MapPath("~/Reports");
+            string filePath = Path.Combine(directoryPath, "UsersReport.pdf");
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath); // Create directory if not exists
+            }
+
+            ExportOptions exportOptions = new ExportOptions();
+            DiskFileDestinationOptions diskOptions = new DiskFileDestinationOptions();
+            PdfRtfWordFormatOptions pdfOptions = new PdfRtfWordFormatOptions();
+            diskOptions.DiskFileName = filePath;
+            exportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+            exportOptions.ExportFormatType = ExportFormatType.PortableDocFormat;
+            exportOptions.DestinationOptions = diskOptions;
+            exportOptions.FormatOptions = pdfOptions;
+            try
+            {
+                rptDoc.Export(exportOptions);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while exporting the report.", ex);
+            }
+            FileInfo file = new FileInfo(filePath);
+            if (file.Exists)
+            {
+                Response.Clear();
+                Response.Buffer = true;
+                Response.AddHeader("content-disposition", "attachment;filename=" + file.Name);
+                Response.AddHeader("content-length", file.Length.ToString());
+                Response.ContentType = "application/pdf";
+                Response.WriteFile(file.FullName);
+                Response.End();
+            }
+        }
         protected void RolesbtnExportPDF_Click(object sender, EventArgs e)
         {
             DataTable dataTable = GetRolesDataFromProcedure();
@@ -252,7 +254,7 @@ namespace LoginApp
                 DataTable dt = new DataTable();
                 da.Fill(dt);
 
-            Session["RolesDs"] = dt;
+                Session["RolesDs"] = dt;
             }
             Debug.Write(" call \n");
             RolesGridView.DataBind();
@@ -364,7 +366,7 @@ namespace LoginApp
                     Session["UsersDs"] = dt;
                 }
             }
-            }
+        }
 
         protected void UsersGridView_RowUpdating(object sender, DevExpress.Web.Data.ASPxDataUpdatingEventArgs e)
         {
@@ -433,18 +435,19 @@ namespace LoginApp
 
         protected void UsersGridView_RowDeleting(object sender, DevExpress.Web.Data.ASPxDataDeletingEventArgs e)
         {
-            {   string username = e.Keys["Username"].ToString();
-            string query = "DELETE FROM [dbo].[Users] WHERE Username = @Username";
-            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Username", username);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                conn.Close();
+                string username = e.Keys["Username"].ToString();
+                string query = "DELETE FROM [dbo].[Users] WHERE Username = @Username";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@Username", username);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+                e.Cancel = true;
             }
-            e.Cancel = true;
-        }
             {
                 ReportDocument rptdoc = new ReportDocument();
                 rptdoc.Load(Server.MapPath("~/UsersReport.rpt"));
@@ -465,7 +468,8 @@ namespace LoginApp
                     }
                     Session["UsersDs"] = dt;
                 }
-            } }
+            }
+        }
 
         protected void RolesGridView_RowInserting(object sender, DevExpress.Web.Data.ASPxDataInsertingEventArgs e)
         {
@@ -504,20 +508,20 @@ namespace LoginApp
         {
             {
                 string RoleId = e.Keys["Id"].ToString();
-            string roleName = e.NewValues["Name"].ToString();
-            string query = "UPDATE [dbo].[Roles] SET Name = @Name WHERE id = @id";
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Name", roleName);
-                cmd.Parameters.AddWithValue("@id", RoleId);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                conn.Close();
+                string roleName = e.NewValues["Name"].ToString();
+                string query = "UPDATE [dbo].[Roles] SET Name = @Name WHERE id = @id";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@Name", roleName);
+                    cmd.Parameters.AddWithValue("@id", RoleId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+                e.Cancel = true;
+                RolesGridView.CancelEdit();
             }
-            e.Cancel = true;
-            RolesGridView.CancelEdit();
-        }
             {
                 string query = "SELECT Id, Name FROM Roles";
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -588,11 +592,11 @@ namespace LoginApp
         protected void UsersGridView_DataBinding(object sender, EventArgs e)
         {
             Debug.Write("Here Data Binding\n");
-            UsersGridView.DataSource = Session["UsersDs"];        
+            UsersGridView.DataSource = Session["UsersDs"];
         }
 
         protected void RolesGridView_DataBinding(object sender, EventArgs e)
-        {       
+        {
             RolesGridView.DataSource = Session["RolesDs"];
         }
     }

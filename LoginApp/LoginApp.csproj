@@ -113,7 +113,6 @@
     <Compile Include="login.aspx.designer.cs">
       <DependentUpon>login.aspx</DependentUpon>
     </Compile>
-    <Compile Include="PasswordHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UsersReport.cs">
       <AutoGen>True</AutoGen>
@@ -135,6 +134,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
     <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\PasswordHelper.vbproj">
+      <Project>{CF213923-94F5-41FC-BD46-88CDCA134EA7}</Project>
+      <Name>PasswordHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
